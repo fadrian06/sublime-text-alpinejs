@@ -6,9 +6,7 @@
 
 <div x-data="{ open: {{ $var }} }"></div>
 --   ^^^^^^^ meta.tag meta.attribute-with-value.alpinejs.html - meta.string
---          ^ meta.tag meta.attribute-with-value.alpinejs.html meta.string.html - meta.interpolation
---           ^^^^^^^^^^^^^^^^^^^^ meta.tag meta.attribute-with-value.alpinejs.html meta.string.html meta.interpolation.html
---                               ^ meta.tag meta.attribute-with-value.alpinejs.html meta.string.html - meta.interpolation
+--          ^^^^^^^^^^^^^^^^^^^^^^ meta.tag meta.attribute-with-value.alpinejs.html meta.string.html
 --   ^^^^^^ entity.other.attribute-name.alpinejs.html
 --         ^ punctuation.separator.key-value.html
 --          ^ string.quoted.double.html punctuation.definition.string.begin.html
