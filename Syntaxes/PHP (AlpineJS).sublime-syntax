@@ -18,7 +18,7 @@ contexts:
     # :attr = shorthand syntax for x-bind:attribute="..."
     # @event = shorthand syntax for x-on:event="..."
     - match: '[:@]|(?=x-)'
-      scope: punctuation.definition.attribute.alpinejs.html
+      scope: entity.other.attribute-name.alpinejs.html punctuation.definition.attribute.alpinejs.html
       push:
         - tag-alpinejs-attribute-meta
         - tag-event-attribute-assignment
@@ -26,26 +26,21 @@ contexts:
 
   tag-alpinejs-attribute-meta:
     - meta_include_prototype: false
-    - meta_scope: meta.attribute-with-value.alpinejs.html
+    - meta_scope: meta.directive.other.alpinejs
     - include: immediately-pop
 
   tag-alpinejs-attribute-name:
-    - match: (?=[.{{attribute_name_break_char}}])
-      pop: 1
+    - meta_content_scope: entity.other.attribute-name.alpinejs.html
+    - include: tag-alpinejs-attribute-modifier
     - match: ':'
       scope: punctuation.definition.attribute.alpinejs.html
     - match: '["''`<]'
       scope: invalid.illegal.attribute-name.alpinejs.html
 
   tag-alpinejs-attribute-modifier:
-    - meta_include_prototype: false
-    - meta_scope: entity.other.attribute-name.alpinejs.html
-    - match: \.
-      scope: punctuation.separator.key-value.datastar
-      push: tag-alpinejs-attribute-modifier-value
-    - include: immediately-pop
-
-  tag-alpinejs-attribute-modifier-value:
-    - meta_content_scope: storage.modifier.alpinejs
-    - match: (?=[.{{attribute_name_break_char}}])
+    - meta_content_scope: entity.other.attribute-name.alpinejs.html storage.modifier.alpinejs
+    - match: '{{attribute_name_break}}'
       pop: 1
+    - match: \.
+      scope: entity.other.attribute-name.alpinejs.html punctuation.separator.key-value.datastar
+      set: tag-alpinejs-attribute-modifier
