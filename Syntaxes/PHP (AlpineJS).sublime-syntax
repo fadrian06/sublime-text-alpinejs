@@ -30,12 +30,22 @@ contexts:
     - include: immediately-pop
 
   tag-alpinejs-attribute-name:
-    - meta_scope: entity.other.attribute-name.alpinejs.html
-    - match: '{{attribute_name_break}}'
+    - match: (?=[.{{attribute_name_break_char}}])
       pop: 1
-    - match: '["''`<]'
-      scope: invalid.illegal.attribute-name.alpinejs.html
     - match: ':'
       scope: punctuation.definition.attribute.alpinejs.html
+    - match: '["''`<]'
+      scope: invalid.illegal.attribute-name.alpinejs.html
+
+  tag-alpinejs-attribute-modifier:
+    - meta_include_prototype: false
+    - meta_scope: entity.other.attribute-name.alpinejs.html
     - match: \.
-      scope: punctuation.separator.namespace.alpinejs.html
+      scope: punctuation.separator.key-value.datastar
+      push: tag-alpinejs-attribute-modifier-value
+    - include: immediately-pop
+
+  tag-alpinejs-attribute-modifier-value:
+    - meta_content_scope: storage.modifier.alpinejs
+    - match: (?=[.{{attribute_name_break_char}}])
+      pop: 1
