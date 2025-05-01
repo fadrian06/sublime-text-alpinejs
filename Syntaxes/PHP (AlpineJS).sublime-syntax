@@ -17,18 +17,12 @@ contexts:
   tag-alpinejs-attributes:
     # :attr = shorthand syntax for x-bind:attribute="..."
     # @event = shorthand syntax for x-on:event="..."
-    - match: '[:@]'
+    - match: '[:@]|(?=x-)'
       scope: punctuation.definition.attribute.alpinejs.html
       push:
         - tag-alpinejs-attribute-meta
         - tag-event-attribute-assignment
         - tag-alpinejs-attribute-name
-
-    - match: 'x-[\w-]+(\.\w+)*'
-      scope: entity.other.attribute-name.alpinejs.html
-      push:
-        - tag-alpinejs-attribute-meta
-        - tag-event-attribute-assignment
 
   tag-alpinejs-attribute-meta:
     - meta_include_prototype: false
