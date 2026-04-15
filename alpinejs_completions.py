@@ -1,3 +1,4 @@
+from __future__ import annotations
 import re
 from sublime import View, CompletionList, CompletionItem, Region, INHIBIT_WORD_COMPLETIONS
 from sublime_plugin import EventListener
