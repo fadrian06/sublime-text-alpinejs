@@ -1,6 +1,6 @@
 from __future__ import annotations
 import re
-from sublime import View, CompletionList, CompletionItem, Region, INHIBIT_WORD_COMPLETIONS
+from sublime import View, CompletionList, CompletionItem, Region, AutoCompleteFlags
 from sublime_plugin import EventListener
 from typing import Dict, List, Set, Tuple, Optional
 from sublime_types import Point, KindId
@@ -465,7 +465,7 @@ class AlpineJsCompletions(EventListener):
                 CompletionItem('alpine:initialized', kind=kind_custom_event, details='After Alpine finishes initializing'),
             ]
             out = [c for c in lifecycle_events if c.trigger.lower().startswith(prefix.lower())]
-            return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+            return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
         # 1.5 CONTEXTO: Dentro del objeto raiz de Alpine.data(...)
         if self.is_inside_top_level_alpine_data_object(view, pt):
@@ -473,7 +473,7 @@ class AlpineJsCompletions(EventListener):
                 CompletionItem.snippet_completion('init', 'init() {\n\t$1\n}', kind=kind_method, details='Alpine.data lifecycle method')
             ]
             out = [c for c in lifecycle_methods if c.trigger.lower().startswith(prefix.lower())]
-            return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+            return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
         # 2. CONTEXTO: Dentro de un VALOR de atributo
         attr_name, is_inside = self.get_current_alpine_attribute(view, pt)
@@ -495,7 +495,7 @@ class AlpineJsCompletions(EventListener):
                             member_kind = kind_method if store_members[member_name] == 'method' else kind_property
                             member_detail = 'Store Method' if store_members[member_name] == 'method' else 'Store Property'
                             out.append(CompletionItem(member_name, kind=member_kind, details=member_detail))
-                    return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                    return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
                 store_match = re.search(r'\$store\.(\w*)$', line_prefix)
                 if store_match:
@@ -503,7 +503,7 @@ class AlpineJsCompletions(EventListener):
                     for store_name in sorted(list(self.get_registered_store_names(view))):
                         if store_name not in ignored_keys and store_name.lower().startswith(store_prefix):
                             out.append(CompletionItem(store_name, kind=kind_store, details='Registered Alpine.store'))
-                    return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                    return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
                 # Caso A: this.
                 this_match = re.search(r'\bthis\.(\w*)$', line_prefix)
@@ -514,7 +514,7 @@ class AlpineJsCompletions(EventListener):
                             member_kind = kind_method if members[member_name] == 'method' else kind_property
                             member_detail = 'Component Method' if members[member_name] == 'method' else 'Component Property'
                             out.append(CompletionItem(member_name, kind=member_kind, details=member_detail))
-                    return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                    return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
                 # Caso B: Variables normales
                 iteration_vars = self.get_active_iteration_vars(view, pt)
@@ -554,9 +554,9 @@ class AlpineJsCompletions(EventListener):
                 )
 
                 out = [c for c in completions if c.trigger.lower().startswith(prefix.lower())]
-                return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
             else:
-                return CompletionList([], flags=INHIBIT_WORD_COMPLETIONS)
+                return CompletionList([], flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
         # 3. CONTEXTO: NOMBRE de atributo (Modificadores/Eventos)
         last_word = line_prefix.split()[-1] if line_prefix.strip() else ""
@@ -580,7 +580,7 @@ class AlpineJsCompletions(EventListener):
 
                 if transition_values:
                     out = [CompletionItem(value, kind=kind_modifier, details=desc) for value, desc in transition_values]
-                    return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                    return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
                 transition_modifiers = [('duration', 'Set transition duration'), ('delay', 'Set transition delay'),
                                         ('opacity', 'Opacity only transition'), ('scale', 'Scale only transition'),
@@ -588,7 +588,7 @@ class AlpineJsCompletions(EventListener):
                                         ('right', 'Right origin'), ('bottom', 'Bottom origin'),
                                         ('left', 'Left origin')]
                 out = [CompletionItem(mod, kind=kind_modifier, details=desc) for mod, desc in transition_modifiers]
-                return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
             if attr_base.startswith(('@', 'x-on:')):
                 event_name = re.sub(r'^(?:@|x-on:)', '', attr_base)
@@ -597,14 +597,14 @@ class AlpineJsCompletions(EventListener):
 
                 if re.search(r'(?:@|x-on:)[\w-]+(?:\.(?:window|document))?\.passive\.(\w*)$', last_word):
                     out = [CompletionItem('false', kind=kind_modifier, details='Make listener cancelable')]
-                    return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                    return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
                 if re.search(r'(?:@|x-on:)[\w-]+(?:\.[\w-]+)*\.(?:debounce|throttle)\.(\w*)$', last_word):
                     timings = [('75ms', '75 milliseconds'), ('150ms', '150 milliseconds'),
                                ('250ms', '250 milliseconds'), ('500ms', '500 milliseconds'),
                                ('750ms', '750 milliseconds'), ('1000ms', '1000 milliseconds')]
                     out = [CompletionItem(value, kind=kind_modifier, details=desc) for value, desc in timings]
-                    return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                    return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
                 generic_modifiers = [('prevent', 'preventDefault'), ('stop', 'stopPropagation'),
                                      ('outside', 'Outside element'), ('window', 'Listen on window'),
@@ -639,7 +639,7 @@ class AlpineJsCompletions(EventListener):
                 out = [CompletionItem(mod, kind=kind_modifier, details=desc) if has_assignment else
                        CompletionItem.snippet_completion(mod, mod + '="$1"', kind=kind_modifier, details=desc)
                        for mod, desc in modifiers]
-                return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+                return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
         if re.search(r'(?:x-on:|@)[\w-]*$', line_prefix):
             descendant_custom_events = self.get_descendant_custom_event_names(view, pt)
@@ -668,7 +668,7 @@ class AlpineJsCompletions(EventListener):
                 CompletionItem.snippet_completion(event, event + '="$1"', kind=kind_event)
                 for event in sorted(events) if event not in global_custom_events
             ])
-            return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+            return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
         if re.search(r'(?:x-bind:|:)[\w:-]*$', line_prefix):
             line_suffix = view.substr(Region(pt, view.line(pt).b))
@@ -703,7 +703,7 @@ class AlpineJsCompletions(EventListener):
             out = [CompletionItem(target, kind=kind_attribute, details=desc) if has_assignment else
                    CompletionItem.snippet_completion(target, target + '="$1"', kind=kind_attribute, details=desc)
                    for target, desc in bind_targets]
-            return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+            return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
         if re.search(r'x-transition:[\w-]*$', line_prefix):
             line_suffix = view.substr(Region(pt, view.line(pt).b))
@@ -717,7 +717,7 @@ class AlpineJsCompletions(EventListener):
             out = [CompletionItem(phase, kind=kind_directive, details=desc) if has_assignment else
                    CompletionItem.snippet_completion(phase, phase + '="$1"', kind=kind_directive, details=desc)
                    for phase, desc in phases]
-            return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+            return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
 
         # 4. CONTEXTO: Directivas base x-* 
         if view.match_selector(pt, 'meta.tag'):
@@ -755,6 +755,6 @@ class AlpineJsCompletions(EventListener):
                        CompletionItem.snippet_completion('x-ref', 'x-ref="$1"', kind=kind_directive),
                        CompletionItem('x-cloak', kind=kind_directive),
                        CompletionItem.snippet_completion('x-id', 'x-id="$1"', kind=kind_directive)]
-            return CompletionList(out, flags=INHIBIT_WORD_COMPLETIONS)
+            return CompletionList(out, flags=AutoCompleteFlags.INHIBIT_WORD_COMPLETIONS)
             
         return CompletionList([])
